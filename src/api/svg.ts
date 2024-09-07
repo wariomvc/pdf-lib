@@ -338,6 +338,34 @@ const runnersToPage = (
       blendMode: options.blendMode,
     });
   },
+
+  polyline(element) {
+    console.log(element.svgAttributes.points);
+    const points = element.svgAttributes.points;
+    if (!points) return;
+
+    const pointPairs = points
+      .trim()
+      .split(/\s+/)
+      .map((point) => {
+        const [x, y] = point.split(',').map(parseFloat);
+        return { x, y: -y }; // Invert y-axis for PDF coordinate system
+      });
+
+    for (let i = 0; i < pointPairs.length - 1; i++) {
+      page.drawLine({
+        start: pointPairs[i],
+        end: pointPairs[i + 1],
+        thickness: element.svgAttributes.strokeWidth,
+        color: element.svgAttributes.stroke,
+        opacity: element.svgAttributes.strokeOpacity,
+        lineCap: element.svgAttributes.strokeLineCap,
+        matrix: element.svgAttributes.matrix,
+        clipSpaces: element.svgAttributes.clipSpaces,
+        blendMode: options.blendMode,
+      });
+    }
+  },
   path(element) {
     if (!element.svgAttributes.d) return;
     // See https://jsbin.com/kawifomupa/edit?html,output and
@@ -638,6 +666,9 @@ const parseAttributes = (
   if (newInherited.strokeWidth) {
     svgAttributes.strokeWidth = newInherited.strokeWidth;
   }
+  if (attributes.points) {
+    svgAttributes.points = attributes.points;
+  }
 
   return {
     inherited: newInherited,
@@ -806,6 +837,7 @@ const parseSvgNode = (
 ): SVGElement[] => {
   // if the width/height aren't set, the svg will have the same dimension as the current drawing space
   /* tslint:disable:no-unused-expression */
+
   node.attributes.width ??
     node.setAttribute('width', inherited.viewBox.width + '');
   node.attributes.height ??
@@ -1031,6 +1063,7 @@ export const drawSvg = (
     //     thickness: 1
     //   })
     // })
+
     runners[elt.tagName]?.(elt);
   });
 };
