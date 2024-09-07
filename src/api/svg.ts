@@ -1020,7 +1020,7 @@ export const drawSvg = (
     );
   }
 
-  const baseTransformation: TransformationMatrix = [
+  let baseTransformation: TransformationMatrix = [
     1,
     0,
     0,
@@ -1028,6 +1028,17 @@ export const drawSvg = (
     options.x || 0,
     options.y || 0,
   ];
+
+  // Apply rotation if present in the transform attribute
+  if (attributes.transform) {
+    const regexTransform = /rotate\(([^)]+)\)/;
+    const match = regexTransform.exec(attributes.transform);
+    if (match) {
+      const [angle, cx = 0, cy = 0] = match[1].split(/[\s,]+/).map(parseFloat);
+      const rotationMatrix = transformationToMatrix('rotate', [angle, cx, cy]);
+      baseTransformation = combineMatrix(baseTransformation, rotationMatrix);
+    }
+  }
 
   const elements = parse(svgNode.outerHTML, options, size, baseTransformation);
 
