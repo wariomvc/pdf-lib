@@ -45,6 +45,7 @@ import {
   PDFRef,
   PDFDict,
   PDFArray,
+  AnnotationFlags,
 } from '../core';
 import {
   assertEachIs,
@@ -59,6 +60,7 @@ import {
   assertIsOneOfOrUndefined,
 } from '../utils';
 import { drawSvg } from './svg';
+import { IconName } from 'src/types/annotation';
 
 /**
  * Represents a single page of a [[PDFDocument]].
@@ -1542,6 +1544,63 @@ export default class PDFPage {
         clipSpaces: options.clipSpaces,
       }),
     );
+  }
+  /**
+   * Draw a text annotation on this page. For example:
+   * ```js
+   * page.drawTextAnnotation({
+   *   x: 200,
+   *   y: 150,
+   *   width: 100,
+   *   height: 50,
+   *   color: rgb(0.75, 0.2, 0.2),
+   *   content: 'This is a text annotation',
+   * })
+   * ```
+   * @param options The options to be used when drawing the text annotation.
+   */
+  drawTextAnnotation(options: {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    color: { r: number; g: number; b: number };
+    content: PDFHexString;
+    font?: PDFFont;
+    flags?: AnnotationFlags;
+    open?: boolean;
+    icon?: IconName;
+  }): void {
+    assertOrUndefined(options.font, 'options.font', [[PDFFont, 'PDFFont']]);
+    assertIs(options.x, 'x', ['number']);
+    assertIs(options.y, 'y', ['number']);
+    assertIs(options.width, 'width', ['number']);
+    assertIs(options.height, 'height', ['number']);
+    assertIs(options.color, 'color', [[Object, 'Color']]);
+    assertIs(options.flags, 'flags', ['number']);
+    assertIs(options.open, 'open', ['boolean']);
+    assertIs(options.icon, 'icon', ['string']);
+
+    //const { newFont } = this.setOrEmbedFont(options.font);
+    //const text = newFont.encodeText(options.content);
+    const annotation = this.doc.context.obj({
+      Type: 'Annot',
+      Subtype: 'Text',
+      Rect: [
+        options.x,
+        options.y,
+        options.x + options.width,
+        options.y + options.height,
+      ],
+      Contents: options.content,
+      F: options.flags,
+      Name: options.icon,
+      C: [options.color.r, options.color.g, options.color.b],
+    });
+
+    const annots = this.node.Annots() || this.doc.context.obj([]);
+    annots.push(annotation);
+    this.node.set(PDFName.of('Annots'), annots);
   }
 
   /**

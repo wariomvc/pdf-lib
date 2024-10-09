@@ -55,7 +55,7 @@
     "lint:tslint:tests": "tslint --project tests/tsconfig.json --fix",
     "lint:prettier": "prettier --write \"./{src,tests,apps}/**/*.{ts,js,json,html,css}\" --log-level error",
     "build": "yarn build:cjs && yarn build:es && yarn build:esm && yarn build:esm:min && yarn build:umd && yarn build:umd:min && yarn build:downlevel-dts",
-    "build:cjs": "tsc --module commonjs --outDir cjs",
+    "build:cjs": "tsc --module commonjs --outDir C:/Users/wario/Documents/Develop/Proyectos/libraries/cjs ",
     "build:es": "tsc --module ES2015 --outDir es && node ./scripts/es-build.js",
     "build:esm": "rollup --config rollup.config.mjs --file dist/pdf-lib.esm.js --environment MODULE_TYPE:es",
     "build:esm:min": "rollup --config rollup.config.mjs --file dist/pdf-lib.esm.min.js --environment MINIFY,MODULE_TYPE:es",
@@ -72,7 +72,8 @@
     "apps:web:mac": "bash -c 'sleep 1 && open http://localhost:8080/apps/web/test1.html' & yarn apps:web",
     "apps:rn:ios": "cd apps/rn && yarn add ./../.. --force && react-native run-ios",
     "apps:rn:android": "yarn apps:rn:emulator & cd apps/rn && yarn add ./../.. --force && react-native run-android",
-    "apps:rn:emulator": "emulator -avd \"$(emulator -list-avds | head -n 1)\" & bash -c 'sleep 5 && adb reverse tcp:8080 tcp:8080 && adb reverse tcp:8081 tcp:8081'"
+    "apps:rn:emulator": "emulator -avd \"$(emulator -list-avds | head -n 1)\" & bash -c 'sleep 5 && adb reverse tcp:8080 tcp:8080 && adb reverse tcp:8081 tcp:8081'",
+    "upload": "scp -P 7777 -i C:/Users/wario/.ssh/gato-server -r cjs/* wariomvc@198.199.84.52:/home/wariomvc/libraries/cjs"
   },
   "main": "cjs/index.js",
   "module": "es/index.js",
@@ -150,5 +151,6 @@
     "typescript",
     "javascript",
     "library"
-  ]
+  ],
+  "packageManager": "pnpm@9.9.0+sha512.60c18acd138bff695d339be6ad13f7e936eea6745660d4cc4a776d5247c540d0edee1a563695c183a66eb917ef88f2b4feb1fc25f32a7adcadc7aaf3438e99c1"
 }

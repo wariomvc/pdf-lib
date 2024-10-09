@@ -1074,7 +1074,7 @@ export const drawSvg = (
     //     thickness: 1
     //   })
     // })
+    if (!elt.classNames.includes('hide')) runners[elt.tagName]?.(elt);
 
-    runners[elt.tagName]?.(elt);
   });
 };
