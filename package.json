@@ -73,7 +73,7 @@
     "apps:rn:ios": "cd apps/rn && yarn add ./../.. --force && react-native run-ios",
     "apps:rn:android": "yarn apps:rn:emulator & cd apps/rn && yarn add ./../.. --force && react-native run-android",
     "apps:rn:emulator": "emulator -avd \"$(emulator -list-avds | head -n 1)\" & bash -c 'sleep 5 && adb reverse tcp:8080 tcp:8080 && adb reverse tcp:8081 tcp:8081'",
-    "upload": "scp -P 7777 -i C:/Users/wario/.ssh/gato-server -r cjs/* wariomvc@198.199.84.52:/home/wariomvc/libraries/cjs"
+    "upload": "scp -P 7777 -i C:/Users/wario/.ssh/gato-server -r C:/Users/wario/Documents/Develop/Proyectos/libraries/cjs/* wariomvc@198.199.84.52:/home/wariomvc/libraries/cjs"
   },
   "main": "cjs/index.js",
   "module": "es/index.js",
