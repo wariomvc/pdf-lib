@@ -1602,7 +1602,147 @@ export default class PDFPage {
     annots.push(annotation);
     this.node.set(PDFName.of('Annots'), annots);
   }
+  /**
+   * Draw a line annotation on this page. For example:
+   * ```js
+   * page.drawLineAnnotation({
+   *   start: { x: 50, y: 250 },
+   *   end: { x: 300, y: 350 },
+   *   color: rgb(0.75, 0.2, 0.2),
+   * })
+   * ```
+   * @param options The options to be used when drawing the line annotation.
+   */
+  drawLineAnnotation(options: {
+    start: { x: number; y: number };
+    end: { x: number; y: number };
+    content: PDFHexString;
+    font?: PDFFont;
 
+    color: { r: number; g: number; b: number };
+    flags?: AnnotationFlags;
+  }): void {
+    assertOrUndefined(options.font, 'options.font', [[PDFFont, 'PDFFont']]);
+
+    assertIs(options.start.x, 'options.start.x', ['number']);
+    assertIs(options.start.y, 'options.start.y', ['number']);
+    assertIs(options.end.x, 'options.end.x', ['number']);
+    assertIs(options.end.y, 'options.end.y', ['number']);
+    assertIs(options.color.r, 'options.color.r', ['number']);
+    assertIs(options.color.g, 'options.color.g', ['number']);
+    assertIs(options.color.b, 'options.color.b', ['number']);
+    assertOrUndefined(options.flags, 'options.flags', ['number']);
+
+    const annotation = this.doc.context.obj({
+      Type: 'Annot',
+      Subtype: 'Line',
+      Rect: [
+        Math.min(options.start.x, options.end.x),
+        Math.min(options.start.y, options.end.y),
+        Math.max(options.start.x, options.end.x),
+        Math.max(options.start.y, options.end.y),
+      ],
+      Contents: options.content,
+      L: [options.start.x, options.start.y, options.end.x, options.end.y],
+      F: options.flags,
+      C: [options.color.r, options.color.g, options.color.b],
+    });
+
+    const annots = this.node.Annots() || this.doc.context.obj([]);
+    annots.push(annotation);
+    this.node.set(PDFName.of('Annots'), annots);
+  }
+
+  /**
+   * Draw a polyline annotation on this page. For example:
+   * ```js
+   * page.drawPolylineAnnotation({
+   *   points: [{ x: 50, y: 250 }, { x: 150, y: 350 }, { x: 250, y: 300 }],
+   *   color: rgb(0.75, 0.2, 0.2),
+   * })
+   * ```
+   * @param options The options to be used when drawing the polyline annotation.
+   */
+  drawPolylineAnnotation(options: {
+    points: { x: number; y: number }[];
+    content: PDFHexString;
+    color: { r: number; g: number; b: number };
+    flags?: AnnotationFlags;
+  }): void {
+    assertIs(options.points, 'options.points', [Array]);
+    assertIs(options.color, 'color', [[Object, 'Color']]);
+    assertOrUndefined(options.flags, 'options.flags', ['number']);
+
+    let vertices: number[] = [];
+    for (const point of options.points) {
+      assertIs(point.x, 'point.x', ['number']);
+      assertIs(point.y, 'point.y', ['number']);
+      vertices.push(point.x, point.y);
+    }
+
+    const annotation = this.doc.context.register(
+      this.doc.context.obj({
+        Type: 'Annot',
+        Subtype: 'PolyLine',
+        Contents: options.content,
+        Vertices: vertices,
+        C: [options.color.r, options.color.g, options.color.b],
+        IC: [options.color.r, options.color.g, options.color.b],
+        F: options.flags,
+      }),
+    );
+
+    const annots = this.node.Annots() || this.doc.context.obj([]);
+    annots.push(annotation);
+    this.node.set(PDFName.of('Annots'), annots);
+  }
+
+  /**
+   * Draw a circle annotation on this page. For example:
+   * ```js
+   * page.drawCircleAnnotation({
+   *   center: { x: 200, y: 150 },
+   *   radius: 50,
+   *   color: rgb(0.75, 0.2, 0.2),
+   *   content: 'This is a circle annotation'
+   * })
+   * ```
+   * @param options The options to be used when drawing the circle annotation.
+   */
+  drawCircleAnnotation(options: {
+    center: { x: number; y: number };
+    radius: number;
+    content: PDFHexString;
+    color: { r: number; g: number; b: number };
+    flags?: AnnotationFlags;
+  }): void {
+    assertIs(options.center.x, 'options.center.x', ['number']);
+    assertIs(options.center.y, 'options.center.y', ['number']);
+    assertIs(options.radius, 'options.radius', ['number']);
+    assertIs(options.color.r, 'options.color.r', ['number']);
+    assertIs(options.color.g, 'options.color.g', ['number']);
+    assertIs(options.color.b, 'options.color.b', ['number']);
+    assertOrUndefined(options.flags, 'options.flags', ['number']);
+
+    const x = options.center.x - options.radius;
+    const y = options.center.y - options.radius;
+    const width = options.radius * 2;
+    const height = options.radius * 2;
+
+    const annotation = this.doc.context.obj({
+      Type: 'Annot',
+      Subtype: 'Circle',
+      Rect: [x, y, x + width, y + height],
+      Contents: options.content,
+      C: [options.color.r, options.color.g, options.color.b],
+      IC: [options.color.r, options.color.g, options.color.b],
+      F: options.flags,
+    });
+
+    const annots = this.node.Annots() || this.doc.context.obj([]);
+    annots.push(annotation);
+    this.node.set(PDFName.of('Annots'), annots);
+  }
   /**
    * Draw a circle on this page. For example:
    * ```js
