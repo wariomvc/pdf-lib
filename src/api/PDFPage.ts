@@ -1618,7 +1618,7 @@ export default class PDFPage {
     end: { x: number; y: number };
     content: PDFHexString;
     font?: PDFFont;
-
+    tickness: number;
     color: { r: number; g: number; b: number };
     flags?: AnnotationFlags;
   }): void {
@@ -1643,6 +1643,7 @@ export default class PDFPage {
         Math.max(options.start.y, options.end.y),
       ],
       Contents: options.content,
+      BS: { W: options.tickness, S: 'S' },
       L: [options.start.x, options.start.y, options.end.x, options.end.y],
       F: options.flags,
       C: [options.color.r, options.color.g, options.color.b],
@@ -1734,7 +1735,8 @@ export default class PDFPage {
       Subtype: 'Circle',
       Rect: [x, y, x + width, y + height],
       Contents: options.content,
-      C: [options.color.r, options.color.g, options.color.b],
+      BS: { W: 1, S: 'S' },
+      C: [0, 0, 0],
       IC: [options.color.r, options.color.g, options.color.b],
       F: options.flags,
     });
